@@ -1,0 +1,157 @@
+<html>
+<head>
+<title>Degree Sequence Graph Creater</title>
+
+</head>
+
+
+
+<body>
+<label>Enter Degree Sequence. E.g. 3,3,3,2,2,1</label><br>
+<input id="degreeSequence" type="text"/>
+<button onclick="process()">Submit</button>
+
+<br>
+
+<canvas id="demo-canvas" width="200" height="100" style="border:1px solid #000000;">
+Your browser does not support the HTML5 canvas tag.
+</canvas>
+
+
+</body>
+
+<script>
+Array.matrix = function(numrows, numcols, initial){
+   var arr = [];
+   for (var i = 0; i < numrows; ++i){
+	  var columns = [];
+	  for (var j = 0; j < numcols; ++j){
+		 columns[j] = initial;
+	  }
+	  arr[i] = columns;
+	}
+	return arr;
+}
+
+var size;
+
+function process(){
+	var sequence = document.getElementById("degreeSequence").value;
+	//sequence = sequence.replace(/\,/g,"");
+	var array = sequence.split(',');
+	var originalSequence;
+	var front;
+	var graphicCount = 0;
+	var graphic = false;
+	var negativeDegree = false;
+	
+	var matrix;
+
+	for(var i=0; i <array.length;i++){
+		array[i] = parseInt(array[i]);
+	}
+	
+	size = array.length;
+	originalSequence = array; 
+	while(graphic == false){
+		var front = array[0];
+		graphicCount = 0;
+		
+		array = array.slice(1);
+		
+
+		if(front > array.length){
+			alert("invalid sequence");
+			break;
+		}
+		else{
+			for(var i=0; i < front; i++){
+				array[i] -= 1;
+			}
+
+			array.sort(function(a, b){return b-a});
+
+			for(var i=0; i <array.length;i++){
+				if(array[i] ==0){
+					graphicCount += 1;
+				}
+				if(array[i] == -1){
+					negativeDegree = true;
+				}
+			}
+
+			if(negativeDegree){
+				alert("invalid sequence");
+				break;
+			}
+
+			if(graphicCount == array.length){
+				graphic = true;
+				alert("valid");
+				break;
+			}
+			alert(array);
+			alert("graphic count is " + graphicCount);
+
+
+		}
+		
+		
+		
+	}
+	
+	
+
+	
+	
+
+	if(graphic){
+		matrix = Array.matrix(size,size,0);
+		
+		for (var row = 0; row < matrix.length; row++){
+			//inner loop is controlled by the expression grades[rows].length
+			for (var col = 0; col < matrix[row].length; col++){
+				matrix[row][col] = 0;
+			}
+		}
+		
+		alert(countNeighbors(matrix,0));
+		
+		
+	}
+
+}
+
+function countNeighbors(matrix,col){
+	var count = 0;
+	var row = 0;
+	alert("in countNeighbors");
+	
+	while(row <= size){
+		if(matrix[row][col] == 1){
+			count++;
+		}
+		row++;
+	}
+	
+	return count;
+}
+
+	
+	
+
+
+
+	
+
+
+
+</script>
+
+
+	
+
+
+
+
+</html>
