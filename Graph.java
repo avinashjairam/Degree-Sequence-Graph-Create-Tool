@@ -12,7 +12,7 @@ public class Graph extends JFrame {
 	public static void main(String [] args){
 		Graph frame = new Graph();
         frame.setSize(800, 600);
-        frame.setTitle("Graph Creater");
+        frame.setTitle("Graphic Sequence");
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -28,9 +28,15 @@ class NewPanel extends JPanel implements ActionListener{
     String data="";     
 	
 	int [] sequence;
+	int [] originalSequence;
+	int [][] matrix;
+
+	int [] xCoordinates;
+	int [] yCoordinates;
 	int graphicCount = 0;
 	boolean graphic = false;
 	boolean negativeDegree = false;
+	boolean invalid = false;
 	int size;
 
 
@@ -47,10 +53,45 @@ class NewPanel extends JPanel implements ActionListener{
 
 	protected void paintComponent(Graphics g){
 		super.paintComponent(g);
-		//g.drawLine(0,0,600,400);
-	//	int x = sequence.get(0);
+		
+		int endX=300, endY=200, x=300,y=200,z=100;
+  	
+  		if(graphic){
+  			for ( int i = 0; i<size; i++ ){
+     			endX = x + (int)(z*Math.cos( (2*Math.PI/size)*i ));
+      			endY = y - (int)(z*Math.sin( (2*Math.PI/size)*i ));  // Note "-"
+      			xCoordinates[i] = endX +10;
+      			yCoordinates[i] = endY +10;
+      			System.out.println("xCoordinates " + endX + "yCoordinates " + endY);
+		        g.fillOval(endX,endY,20,20);
+		      //  g.drawString(Integer.toString(i),endX,endY);
+    		}
 
-		g.drawString(data,400,220);
+    		for(int i =0; i < size; i++){
+    			 g.drawString(Integer.toString(originalSequence[i]),xCoordinates[i]-10, yCoordinates[i]-10);
+
+    			for(int j = 0; j<size;j++){
+    				if(i == j){
+    					continue;
+    				}
+    				if(matrix[i][j]==1){
+    					g.drawLine(xCoordinates[i],yCoordinates[i],xCoordinates[j],yCoordinates[j]);
+
+    				}
+    			}
+    		}
+    		//g.drawLine(xCoordinates[1],yCoordinates[1],xCoordinates[4],yCoordinates[4]);
+
+    	}
+
+    	if(invalid){
+    		g.drawString(data,400,300);
+    	}
+
+    
+
+		//g.drawString(data,400,220);
+		
 	}
 
 	 public void actionPerformed(ActionEvent e){
@@ -66,8 +107,13 @@ class NewPanel extends JPanel implements ActionListener{
 
     public void initializeSequence(){
     	sequence = new int[data.length()];
+    	originalSequence = new int[data.length()];
+    	xCoordinates = new int[data.length()];
+    	yCoordinates = new int[data.length()];
+
     	for(int i = 0; i < sequence.length;i++){
     		sequence[i] = Character.getNumericValue(data.charAt(i));
+    		originalSequence[i] = Character.getNumericValue(data.charAt(i));
     		//System.out.println(sequence[i]);
     	}
     	System.out.print("after init");
@@ -84,6 +130,7 @@ class NewPanel extends JPanel implements ActionListener{
 
     		if(front > sequence.length){
     			data = "Invalid Sequence!";
+    			invalid = true;
     			repaint();
     			break;
     		}
@@ -107,6 +154,7 @@ class NewPanel extends JPanel implements ActionListener{
 
     			if(negativeDegree){
     				data= "Invalid Sequence";
+    				invalid = true;
     				repaint();
     				break;
     			}
@@ -114,6 +162,11 @@ class NewPanel extends JPanel implements ActionListener{
     			if(graphicCount == sequence.length){
     				graphic =true;
     				data = "valid Sequence";
+    				adjacencyMatrix();
+    				//printMatrix();
+    				findEdges();
+    				printMatrix();
+    				System.out.println("num of edges " + countEdges(0));
     				repaint();
     				break;
     			}
@@ -139,4 +192,63 @@ class NewPanel extends JPanel implements ActionListener{
  			 sequence[sequence.length - 1 - i] = temp;
 		}
    }
-  }
+
+   public void adjacencyMatrix(){
+   		matrix = new int [size][size];
+
+   		for(int i =0; i<size;i++){
+   			for(int j = 0; j<size;j++){
+   				//if((i==j) || (j == 0 && i ==2)){
+   					matrix[i][j]=0;
+   				/*}
+   				else{
+   					matrix[i][j] = 1;
+   				}*/
+   			}
+   		}
+   }
+
+
+   public void printMatrix(){
+   	for(int i =0; i<size;i++){
+   			for(int j = 0; j<size;j++){
+   				System.out.print(matrix[i][j] + " ");
+   			}
+   			System.out.println();
+   		}
+
+   }
+
+   public int countEdges(int col){
+   	int count = 0;
+   	for(int i = 0; i < size; i++){
+   		if(matrix[i][col]==1){
+   			count++;
+   		}
+   	}
+
+   	return count;
+   }
+
+  public void findEdges(){
+  	int checks = 0;
+   	for(int i = 0; i < size; i++){
+   		checks =0;
+   		for(int j = 0; j <size; j++){
+   			if(i==j){
+   				continue;
+   			}
+   			else{
+   				if(countEdges(j) < originalSequence[j]){
+   					System.out.println("i =" +i + " j =" +j + "countEdges " + countEdges(j) + " originalSequence " +originalSequence[j]);
+   					if(checks < originalSequence[i]){
+   						matrix[i][j]=1;
+   						checks++;
+   					}
+   				}
+   			}
+   		} 
+   }
+ }
+
+}
