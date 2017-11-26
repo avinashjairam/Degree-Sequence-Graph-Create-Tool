@@ -54,6 +54,8 @@ class NewPanel extends JPanel implements ActionListener{
   ArrayList<Vertex> vertex;
   ArrayList<Edge>edges;
 
+  ArrayList<ArrayList<Vertex>> subVertex = new ArrayList<>();
+
 
 	boolean graphic = false;
 	boolean negativeDegree = false;
@@ -87,10 +89,7 @@ class NewPanel extends JPanel implements ActionListener{
           for(int j=0; j< edges.get(i).getNeighborsSize();j++){
             g.drawLine(edges.get(i).getX(),edges.get(i).getY()+10,edges.get(i).neighbors.get(j).getXCoordinates(),edges.get(i).neighbors.get(j).getYCoordinates()+10);
           }
-
-                  //   g.drawString(Integer.toString(originalSequence[i]),xCoordinates[i]-10, yCoordinates[i]-10);
-
-        }
+       }
       
   			for ( int i = 0; i<size; i++ ){
      			endX = x + (int)(z*Math.cos( (2*Math.PI/size)*i ));
@@ -235,7 +234,6 @@ class NewPanel extends JPanel implements ActionListener{
     			if(graphicCount == sequence.length){
     				graphic =true;
     				data = "valid Sequence";
-    				adjacencyMatrix();
     				//printMatrix();
     				findEdges();
     			   printEdges();
@@ -248,10 +246,6 @@ class NewPanel extends JPanel implements ActionListener{
 
     		}
         }
-
-    }
-
-    public void adjacencyList(){
 
     }
 
@@ -268,43 +262,6 @@ class NewPanel extends JPanel implements ActionListener{
  			 sequence[i] = sequence[sequence.length - 1 - i];
  			 sequence[sequence.length - 1 - i] = temp;
 		}
-   }
-
-   public void adjacencyMatrix(){
-   		matrix = new int [size][size];
-
-   		for(int i =0; i<size;i++){
-   			for(int j = 0; j<size;j++){
-   				//if((i==j) || (j == 0 && i ==2)){
-   					matrix[i][j]=0;
-   				/*}
-   				else{
-   					matrix[i][j] = 1;
-   				}*/
-   			}
-   		}
-   }
-
-
-   public void printMatrix(){
-   	for(int i =0; i<size;i++){
-   			for(int j = 0; j<size;j++){
-   				System.out.print(matrix[i][j] + " ");
-   			}
-   			System.out.println();
-   		}
-
-   }
-
-   public int countEdges(int col){
-   	int count = 0;
-   	for(int i = 0; i < size; i++){
-   		if(matrix[i][col]==1){
-   			count++;
-   		}
-   	}
-
-   	return count;
    }
 
   public void findEdges(){
@@ -328,11 +285,25 @@ class NewPanel extends JPanel implements ActionListener{
       edge.printList();
 
        for(int i = 0; i <front.getDegree();i++){
-        vertex.get(i).decrement();
-        if(vertex.get(i).getDegree() == 0){
-          vertex.remove(i);
+        if(i == vertex.size()){
+           System.out.println("i =" + i + " vertex size" + vertex.size());
+             vertex.get(i-1).decrement();
+
+             if(vertex.get(i-1).getDegree() == 0){
+                vertex.remove(i-1);
+              }
+
+
+             break;
         }
+            vertex.get(i).decrement();
+
+              if(vertex.get(i).getDegree() == 0){
+                vertex.remove(i);
+              }
+        
       }
+      Collections.shuffle(vertex);
 
       Collections.sort(vertex, (v1, v2) -> v2.getDegree() - v1.getDegree());    
     }
