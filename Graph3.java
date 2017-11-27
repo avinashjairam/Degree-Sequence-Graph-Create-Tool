@@ -54,14 +54,16 @@ class NewPanel extends JPanel implements ActionListener{
   ArrayList<Vertex> vertex;
   ArrayList<Edge>edges;
 
-  ArrayList<ArrayList<Vertex>> subVertex = new ArrayList<>();
+  ArrayList<ArrayList<Vertex>> subVertex = new ArrayList<ArrayList<Vertex>>();
 
 
 	boolean graphic = false;
 	boolean negativeDegree = false;
 	boolean invalid = false;
+  boolean reset = false;
 	int size;
     int endX=300, endY=400, x=300,y=300,z=200;
+    Color randomColor = new Color(220, 220, 220);
 
 
 	public NewPanel(){
@@ -78,16 +80,31 @@ class NewPanel extends JPanel implements ActionListener{
 	}
 
 	protected void paintComponent(Graphics g){
-    Color randomColor = new Color(220, 220, 220);
+    
 
 		super.paintComponent(g);
 		
 		// int endX=300, endY=400, x=300,y=300,z=200;
+
+    System.out.println("Graphic is " + graphic);
+
+    if(reset){
+             g.setColor(UIManager.getColor ( "Panel.background" ));
+             g.fillRect(0,0,1200,1000);
+             reset=false;
+              g.setColor(randomColor);
+
+          
+     }
+
   	
   		if(graphic){
+                    g.setColor(new Color(0,0,0));
+
          for(int i=0; i <edges.size();i++){
           for(int j=0; j< edges.get(i).getNeighborsSize();j++){
             g.drawLine(edges.get(i).getX(),edges.get(i).getY()+10,edges.get(i).neighbors.get(j).getXCoordinates(),edges.get(i).neighbors.get(j).getYCoordinates()+10);
+            System.out.println(edges.get(i));
           }
        }
       
@@ -103,6 +120,8 @@ class NewPanel extends JPanel implements ActionListener{
             g.setColor(new Color(0,0,0));
             g.drawString(Character.toString(alphabet[i]),endX+5,endY+15);
             vertex.add(new Vertex(alphabet[i],originalSequence[i], endX+10,endY+10));
+
+           
        
 
     		}
@@ -111,6 +130,7 @@ class NewPanel extends JPanel implements ActionListener{
     	
     	}
 
+    
     	if(invalid){
     		g.drawString(data,400,300);
     	}
@@ -153,11 +173,46 @@ class NewPanel extends JPanel implements ActionListener{
 
 	 public void actionPerformed(ActionEvent e){
         if (e.getSource() == enter) {
-             data = txtdata.getText(); //perform your operation
+              if(graphic){
+                reset=true;
+
+                data="";     
+  
+               sequence=null;
+                originalSequence=null;
+               matrix =null;
+
+               xCoordinates =null;
+              yCoordinates =null;
+              graphicCount = 0;
+
+             vertex = new ArrayList<Vertex>();  
+            edges = new ArrayList<Edge>();
+
+            subVertex = new ArrayList<ArrayList<Vertex>>();
+             graphic = false;
+             negativeDegree = false;
+            invalid = false;
+               size=0;
+                 data = txtdata.getText(); //perform your operation
              data = data.replace(",","");
              data = data.trim();
              initializeSequence();
              processSequence();
+              //  this.dispose();
+               // new Graph3();
+                repaint();
+              }else{
+                 data = txtdata.getText(); //perform your operation
+                  data = data.replace(",","");
+                  data = data.trim();
+                  initializeSequence();
+                   processSequence();
+
+
+              }
+
+            
          //    findEdges();
                 // System.out.println(vertex.size());
 
@@ -192,7 +247,7 @@ class NewPanel extends JPanel implements ActionListener{
     public void processSequence(){
      Collections.sort(vertex, (v1, v2) -> v2.getDegree() - v1.getDegree());
      // findEdges();
-
+     int count =0;
     	size = sequence.length;
     	while(graphic == false){
     		int front = sequence[0];
@@ -207,9 +262,16 @@ class NewPanel extends JPanel implements ActionListener{
     			break;
     		}
     		else{
+          ArrayList<Vertex> sub = new ArrayList<Vertex>();
     			for(int i = 0; i < front;i++){
     				sequence[i] -=1;
+            sub.add(new Vertex(alphabet[i], sequence[i],0,0));
     			}
+
+          subVertex.add(sub);
+                  Collections.sort(subVertex.get(count), (v1, v2) -> v2.getDegree() - v1.getDegree());    
+
+          count++;
     			Arrays.sort(sequence);
     			reverse();
     			//printSequence();
@@ -239,6 +301,13 @@ class NewPanel extends JPanel implements ActionListener{
     			   printEdges();
     		//		System.out.println("num of edges " + countEdges(0));
     				repaint();
+
+            for(ArrayList<Vertex> v : subVertex){
+              for(int i =0; i<v.size();i++){
+                System.out.print(v.get(i).getName() + " " + v.get(i).getDegree() + " ");
+              }
+              System.out.println();
+            }
     				break;
     			}
 
