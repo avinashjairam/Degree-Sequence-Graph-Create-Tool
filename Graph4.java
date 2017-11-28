@@ -391,7 +391,7 @@ class NewPanel extends JPanel implements ActionListener{
               }
         
       }
-//      Collections.shuffle(vertex);
+     Collections.shuffle(vertex);
 
       Collections.sort(vertex, (v1, v2) -> v2.getDegree() - v1.getDegree());    
 
